@@ -27,7 +27,9 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
     async function loadFoods(): Promise<void> {
-      // TODO LOAD FOODS
+      const response = await api.get('/foods');
+
+      setFoods(response.data);
     }
 
     loadFoods();
@@ -37,7 +39,6 @@ const Dashboard: React.FC = () => {
     food: Omit<IFoodPlate, 'id' | 'available'>,
   ): Promise<void> {
     try {
-      // TODO ADD A NEW FOOD PLATE TO THE API
     } catch (err) {
       console.log(err);
     }
@@ -49,9 +50,7 @@ const Dashboard: React.FC = () => {
     // TODO UPDATE A FOOD PLATE ON THE API
   }
 
-  async function handleDeleteFood(id: number): Promise<void> {
-    // TODO DELETE A FOOD PLATE FROM THE API
-  }
+  async function handleDeleteFood(id: number): Promise<void> {}
 
   function toggleModal(): void {
     setModalOpen(!modalOpen);
