@@ -60,8 +60,20 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     async function loadFoods(): Promise<void> {
       try {
-        const response = await api.get('/foods');
-        setFoods(response.data);
+        const { data } = await api.get<Food[]>('/foods', {
+          params: {
+            category_like: selectedCategory,
+            name_like: searchValue,
+          },
+        });
+
+        const formattedFoods = data.map(i => {
+          return {
+            ...i,
+            formattedPrice: formatValue(i.price),
+          };
+        });
+        setFoods(formattedFoods);
       } catch (err) {
         Alert.alert(
           'Erro ao carregar pratos',
@@ -74,16 +86,12 @@ const Dashboard: React.FC = () => {
   }, [selectedCategory, searchValue]);
 
   useEffect(() => {
-    async function loadCategories(): Promise<void> {
-      // Load categories from API
-    }
+    async function loadCategories(): Promise<void> {}
 
     loadCategories();
   }, [selectedCategory, searchValue]);
 
-  function handleSelectCategory(id: number): void {
-    // Select / deselect category
-  }
+  function handleSelectCategory(id: number): void {}
 
   return (
     <Container>
