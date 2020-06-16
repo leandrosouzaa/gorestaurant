@@ -86,12 +86,30 @@ const Dashboard: React.FC = () => {
   }, [selectedCategory, searchValue]);
 
   useEffect(() => {
-    async function loadCategories(): Promise<void> {}
+    async function loadCategories(): Promise<void> {
+      try {
+        const response = await api.get('/categories');
+        setCategories(response.data);
+      } catch (err) {
+        Alert.alert(
+          'Erro ao carregar categorias',
+          'Ocorreu um erro ao categorias os pratos, tente novamente mais tarde.',
+        );
+      }
+    }
 
     loadCategories();
   }, [selectedCategory, searchValue]);
 
-  function handleSelectCategory(id: number): void {}
+  function handleSelectCategory(id: number): void {
+    if (selectedCategory === id) {
+      setSelectedCategory(undefined);
+
+      return;
+    }
+
+    setSelectedCategory(id);
+  }
 
   return (
     <Container>
