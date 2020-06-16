@@ -5,7 +5,7 @@ import React, {
   useMemo,
   useLayoutEffect,
 } from 'react';
-import { Image } from 'react-native';
+import { Image, Alert } from 'react-native';
 
 import Icon from 'react-native-vector-icons/Feather';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
@@ -73,26 +73,68 @@ const FoodDetails: React.FC = () => {
 
   useEffect(() => {
     async function loadFood(): Promise<void> {
-      // Load a specific food with extras based on routeParams id
+      try {
+        const { data } = await api.get<Food>(`/foods/${routeParams.id}`);
+
+        const formattedFood = {
+          ...data,
+          formattedPrice: formatValue(data.price),
+        };
+
+        const formattedExtras = data.extras.map(e => {
+          return {
+            ...e,
+            quantity: 0,
+          };
+        });
+        setExtras(formattedExtras);
+        setFood(formattedFood);
+      } catch (err) {
+        console.log(err);
+        Alert.alert(
+          'Erro ao carregar informações do produto.',
+          'Ocorreu um erro durante o carregamento dos dados, tente novamente mais tarde',
+        );
+      }
     }
 
     loadFood();
   }, [routeParams]);
 
   function handleIncrementExtra(id: number): void {
-    // Increment extra quantity
+    const incrementedExtras = extras.map(e => {
+      if (e.id === id) {
+        e.quantity += 1;
+      }
+
+      return e;
+    });
+
+    setExtras(incrementedExtras);
   }
 
   function handleDecrementExtra(id: number): void {
-    // Decrement extra quantity
+    const decrementExtras = extras.map(e => {
+      if (e.id === id && e.quantity > 0) {
+        e.quantity -= 1;
+      }
+
+      return e;
+    });
+
+    setExtras(decrementExtras);
   }
 
   function handleIncrementFood(): void {
-    // Increment food quantity
+    setFoodQuantity(foodQuantity + 1);
   }
 
   function handleDecrementFood(): void {
-    // Decrement food quantity
+    if (foodQuantity === 1) {
+      return;
+    }
+
+    setFoodQuantity(foodQuantity - 1);
   }
 
   const toggleFavorite = useCallback(() => {
