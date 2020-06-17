@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Image } from 'react-native';
+import { Image, Alert } from 'react-native';
 
 import api from '../../services/api';
 import formatValue from '../../utils/formatValue';
@@ -23,20 +23,66 @@ interface Food {
   name: string;
   description: string;
   price: number;
-  formattedValue: number;
+  formattedPrice: number;
   thumbnail_url: string;
 }
 
-const Orders: React.FC = () => {
+interface Props {
+  navigation: any;
+}
+
+const Orders: React.FC<Props> = ({ navigation }) => {
   const [orders, setOrders] = useState<Food[]>([]);
 
   useEffect(() => {
     async function loadOrders(): Promise<void> {
-      // Load orders from API
+      try {
+        const { data } = await api.get<Food[]>('/orders');
+
+        const formattedOrders = data.map(i => {
+          return {
+            ...i,
+            formattedPrice: formatValue(i.price),
+          };
+        });
+        setOrders(formattedOrders);
+      } catch (err) {
+        Alert.alert(
+          'Erro ao carregar pratos',
+          'Ocorreu um erro ao carregar os pratos, tente novamente mais tarde.',
+        );
+      }
     }
 
     loadOrders();
   }, []);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      async function loadOrders(): Promise<void> {
+        try {
+          const { data } = await api.get<Food[]>('/orders');
+
+          const formattedOrders = data.map(i => {
+            return {
+              ...i,
+              formattedPrice: formatValue(i.price),
+            };
+          });
+          setOrders(formattedOrders);
+        } catch (err) {
+          Alert.alert(
+            'Erro ao carregar pratos',
+            'Ocorreu um erro ao carregar os pratos, tente novamente mais tarde.',
+          );
+        }
+      }
+
+      loadOrders();
+    });
+
+    return unsubscribe;
+  }, [navigation]);
 
   return (
     <Container>

@@ -179,6 +179,7 @@ const FoodDetails: React.FC = () => {
     delete data.id;
 
     await api.post('/orders', data);
+    navigation.navigate('Orders');
   }
 
   // Calculate the correct icon name
