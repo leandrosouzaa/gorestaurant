@@ -87,10 +87,10 @@ const FoodDetails: React.FC = () => {
             quantity: 0,
           };
         });
+
         setExtras(formattedExtras);
         setFood(formattedFood);
       } catch (err) {
-        console.log(err);
         Alert.alert(
           'Erro ao carregar informações do produto.',
           'Ocorreu um erro durante o carregamento dos dados, tente novamente mais tarde',
@@ -112,6 +112,18 @@ const FoodDetails: React.FC = () => {
 
     setExtras(incrementedExtras);
   }
+
+  useEffect(() => {
+    async function setFavorite(): Promise<void> {
+      try {
+        await api.get(`favorites/${routeParams.id}`);
+        setIsFavorite(true);
+      } catch (err) {
+        setIsFavorite(false);
+      }
+    }
+    setFavorite();
+  }, [routeParams.id]);
 
   function handleDecrementExtra(id: number): void {
     const decrementExtras = extras.map(e => {
@@ -137,8 +149,16 @@ const FoodDetails: React.FC = () => {
     setFoodQuantity(foodQuantity - 1);
   }
 
-  const toggleFavorite = useCallback(() => {
-    // Toggle if food is favorite or not
+  const toggleFavorite = useCallback(async () => {
+    if (isFavorite) {
+      await api.delete(`/favorites/${food.id}`);
+      setIsFavorite(false);
+
+      return;
+    }
+
+    await api.post('/favorites', food);
+    setIsFavorite(true);
   }, [isFavorite, food]);
 
   const cartTotal = useMemo(() => {
