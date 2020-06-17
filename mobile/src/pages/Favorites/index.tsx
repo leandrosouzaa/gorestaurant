@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Image } from 'react-native';
+import { Image, Alert } from 'react-native';
 
+import { useNavigation } from '@react-navigation/native';
 import api from '../../services/api';
 import formatValue from '../../utils/formatValue';
 
@@ -30,9 +31,30 @@ interface Food {
 const Favorites: React.FC = () => {
   const [favorites, setFavorites] = useState<Food[]>([]);
 
+  const navigation = useNavigation();
+
+  async function handleNavigate(id: number): Promise<void> {
+    navigation.navigate('FoodDetails', { id });
+  }
+
   useEffect(() => {
     async function loadFavorites(): Promise<void> {
-      // Load favorite foods from api
+      try {
+        const { data } = await api.get<Food[]>('/favorites');
+
+        const formattedFavorites = data.map(i => {
+          return {
+            ...i,
+            formattedPrice: formatValue(i.price),
+          };
+        });
+        setFavorites(formattedFavorites);
+      } catch (err) {
+        Alert.alert(
+          'Erro ao carregar pratos',
+          'Ocorreu um erro ao carregar os pratos, tente novamente mais tarde.',
+        );
+      }
     }
 
     loadFavorites();
@@ -49,7 +71,7 @@ const Favorites: React.FC = () => {
           data={favorites}
           keyExtractor={item => String(item.id)}
           renderItem={({ item }) => (
-            <Food activeOpacity={0.6}>
+            <Food activeOpacity={0.6} onPress={() => handleNavigate(item.id)}>
               <FoodImageContainer>
                 <Image
                   style={{ width: 88, height: 88 }}
