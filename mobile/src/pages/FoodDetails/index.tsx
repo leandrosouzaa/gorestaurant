@@ -156,8 +156,10 @@ const FoodDetails: React.FC = () => {
 
       return;
     }
+    const data = food;
+    delete data.extras;
 
-    await api.post('/favorites', food);
+    await api.post('/favorites', data);
     setIsFavorite(true);
   }, [isFavorite, food]);
 
