@@ -60,33 +60,6 @@ const Favorites: React.FC = () => {
     loadFavorites();
   }, []);
 
-  useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      async function loadFavorites(): Promise<void> {
-        try {
-          const { data } = await api.get<Food[]>('/favorites');
-
-          const formattedFavorites = data.map(i => {
-            return {
-              ...i,
-              formattedPrice: formatValue(i.price),
-            };
-          });
-          setFavorites(formattedFavorites);
-        } catch (err) {
-          Alert.alert(
-            'Erro ao carregar pratos',
-            'Ocorreu um erro ao carregar os pratos, tente novamente mais tarde.',
-          );
-        }
-      }
-
-      loadFavorites();
-    });
-
-    return unsubscribe;
-  }, [navigation]);
-
   return (
     <Container>
       <Header>

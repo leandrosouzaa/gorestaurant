@@ -23,15 +23,11 @@ interface Food {
   name: string;
   description: string;
   price: number;
-  formattedPrice: number;
+  formattedValue: number;
   thumbnail_url: string;
 }
 
-interface Props {
-  navigation: any;
-}
-
-const Orders: React.FC<Props> = ({ navigation }) => {
+const Orders: React.FC = () => {
   const [orders, setOrders] = useState<Food[]>([]);
 
   useEffect(() => {
@@ -56,33 +52,6 @@ const Orders: React.FC<Props> = ({ navigation }) => {
 
     loadOrders();
   }, []);
-
-  useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      async function loadOrders(): Promise<void> {
-        try {
-          const { data } = await api.get<Food[]>('/orders');
-
-          const formattedOrders = data.map(i => {
-            return {
-              ...i,
-              formattedPrice: formatValue(i.price),
-            };
-          });
-          setOrders(formattedOrders);
-        } catch (err) {
-          Alert.alert(
-            'Erro ao carregar pratos',
-            'Ocorreu um erro ao carregar os pratos, tente novamente mais tarde.',
-          );
-        }
-      }
-
-      loadOrders();
-    });
-
-    return unsubscribe;
-  }, [navigation]);
 
   return (
     <Container>
